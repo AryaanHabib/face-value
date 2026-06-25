@@ -168,34 +168,27 @@ export default function Home() {
             <span>{filtered.length} players</span>
           </p>
           {filtered.map((p, idx) => {
-            const pos = p.per100 >= 0,
-              w = (Math.abs(p.per100) / max) * 50;
+            const pos = p.per100 >= 0;
+            const w = Math.max(3, (Math.abs(p.per100) / max) * 100);
             return (
               <Link className="brow" key={p.id} href={`/player/${p.id}`}>
                 <span className="rank">{idx + 1}</span>
-                <div className="bname">
-                  {p.name}
-                  <small>{p.team}</small>
-                </div>
-                <div className="track">
-                  <div className="zero" />
-                  <div
-                    className={"bar " + (pos ? "pos" : "neg")}
-                    style={
-                      pos
-                        ? { left: "50%", width: w + "%" }
-                        : { right: "50%", width: w + "%" }
-                    }
-                  />
-                  <div
-                    className="bval"
-                    style={{
-                      color: pos ? "var(--up)" : "var(--down)",
-                      [pos ? "left" : "right"]: `calc(50% + ${w}% + 8px)`,
-                    }}
-                  >
-                    {pos ? "▲ +" : "▼ "}
-                    {p.per100}
+                <div className="bcontent">
+                  <div className="bhead">
+                    <div className="bname">
+                      <span className="nm">{p.name}</span>
+                      <small>{p.team}</small>
+                    </div>
+                    <div className={"bval " + (pos ? "up" : "down")}>
+                      {pos ? "▲ +" : "▼ "}
+                      {p.per100}
+                    </div>
+                  </div>
+                  <div className="btrack">
+                    <div
+                      className={"bfill " + (pos ? "up" : "down")}
+                      style={{ width: w + "%" }}
+                    />
                   </div>
                 </div>
               </Link>

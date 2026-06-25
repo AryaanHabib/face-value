@@ -320,69 +320,84 @@ a {
 .brow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  gap: 14px;
+  padding: 13px 6px;
   border-bottom: 1px solid var(--line);
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.brow:hover {
+  background: rgba(255, 255, 255, 0.025);
 }
 .rank {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--faint);
-  width: 18px;
+  width: 20px;
   flex: none;
   text-align: right;
 }
+.bcontent {
+  flex: 1;
+  min-width: 0;
+}
+.bhead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
 .bname {
-  width: 118px;
-  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.bname .nm {
   font-family: var(--disp);
   font-weight: 600;
-  font-size: 13.5px;
-  line-height: 1.05;
+  font-size: 15px;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .bname small {
-  display: block;
   font-family: var(--mono);
-  font-weight: 400;
-  font-size: 8px;
+  font-size: 8.5px;
   color: var(--muted);
-  margin-top: 2px;
+  margin-top: 3px;
   letter-spacing: 0.03em;
 }
-.track {
-  flex: 1;
-  position: relative;
-  height: 24px;
-}
-.track .zero {
-  position: absolute;
-  left: 50%;
-  top: 2px;
-  bottom: 2px;
-  width: 1px;
-  background: var(--faint);
-}
-.bar {
-  position: absolute;
-  top: 5px;
-  height: 14px;
-  border-radius: 3px;
-  transition: width 0.4s ease;
-}
-.bar.pos {
-  left: 50%;
-  background: var(--up);
-}
-.bar.neg {
-  background: var(--down);
-}
 .bval {
-  position: absolute;
-  top: 5px;
-  font-family: var(--mono);
+  flex: none;
+  font-family: var(--disp);
   font-weight: 700;
-  font-size: 11.5px;
-  white-space: nowrap;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.bval.up {
+  color: var(--up);
+}
+.bval.down {
+  color: var(--down);
+}
+.btrack {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.bfill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bfill.up {
+  background: linear-gradient(90deg, #0e7e59, #22d196);
+}
+.bfill.down {
+  background: linear-gradient(90deg, #b53a2f, #ff6258);
 }
 
 /* court */
