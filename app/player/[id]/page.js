@@ -16,7 +16,7 @@ export default function Player() {
 
   useEffect(() => { fetch("/players.json").then(r => r.json()).then(setData); }, []);
 
-  const all = (data && data.shots[id]) || [];
+  const all = useMemo(() => (((data && data.shots[id]) || []).map((s, i) => ({ ...s, _i: i }))), [data, id]);
   const shots = useMemo(() => all.filter(s =>
     (result === "all" || (result === "made" && s.m) || (result === "miss" && !s.m)) &&
     (qual.has(s.q) || s.q === "heave")), [all, result, qual]);

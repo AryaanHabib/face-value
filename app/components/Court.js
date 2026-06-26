@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const COLOR = { good: "#1FC288", mid: "#E8A33D", bad: "#FF5B52", heave: "#A878E0" };
 const EXP = { good: 0.56, mid: 0.42, bad: 0.31, heave: 0.05 };
@@ -35,22 +35,7 @@ function hexPath(cx, cy, r) {
 }
 
 export default function Court({ shots = [], mode = "scatter", interactive = false }) {
-  const [hover, setHover] = useState(null);   // {x,y,s} in svg coords
-  const [shown, setShown] = useState(interactive ? 0 : shots.length);
-
-  // animated fill: reveal dots progressively when interactive
-  useEffect(() => {
-    if (!interactive || mode !== "scatter") { setShown(shots.length); return; }
-    setShown(0);
-    let n = 0;
-    const step = Math.max(1, Math.round(shots.length / 28));
-    const id = setInterval(() => {
-      n += step;
-      setShown(n);
-      if (n >= shots.length) clearInterval(id);
-    }, 26);
-    return () => clearInterval(id);
-  }, [shots, mode, interactive]);
+  const [hover, setHover] = useState(null);
 
   if (mode === "zones") {
     const R = 11, dx = R * 1.5, dy = R * Math.sqrt(3), cells = {};
@@ -75,27 +60,29 @@ export default function Court({ shots = [], mode = "scatter", interactive = fals
           const ou = (c.act - c.exp) / c.n;
           const fill = ou >= 0.05 ? COLOR.good : ou <= -0.05 ? COLOR.bad : COLOR.mid;
           const size = R * (0.42 + 0.58 * Math.sqrt(c.n / maxN));
-          return <path key={i} d={hexPath(c.cx, c.cy, size)} fill={fill}
-            opacity={0.85} stroke="#13171A" strokeWidth="0.5"
-            style={{ animation: `pop .4s ease ${i * 6}ms both` }} />;
+          return <path key={i} d={hexPath(c.cx, c.cy, size)} fill={fill} opacity={0.85}
+            stroke="#13171A" strokeWidth="0.5" style={{ animation: `pop .4s ease ${i * 6}ms both` }} />;
         })}
       </svg>
     );
   }
 
-  const vis = shots.slice(0, shown);
   return (
     <div style={{ position: "relative" }}>
       <svg viewBox="0 0 300 250" className="court" aria-label="shot chart"
         onMouseLeave={() => setHover(null)}>
         <CourtLines />
-        {vis.map((s, i) => {
+        {shots.map((s, i) => {
           const cx = mapX(s.x), cy = mapY(s.y);
+          const key = s._i != null ? s._i : i;
+          const op = s.m ? 0.92 : 0.32;                 // makes solid, misses faint -- preserved
           return (
-            <circle key={i} cx={cx} cy={cy} r={s.q === "heave" ? 4 : 3.4}
-              fill={COLOR[s.q] || "#999"} opacity={s.m ? 0.92 : 0.32}
-              stroke={s.m ? "none" : (COLOR[s.q] || "#999")} strokeWidth={s.m ? 0 : 0.6}
-              style={interactive ? { cursor: "pointer", animation: "pop .25s ease both" } : undefined}
+            <circle key={key} cx={cx} cy={cy} r={s.q === "heave" ? 4 : 3.4}
+              fill={COLOR[s.q] || "#999"} fillOpacity={op}
+              stroke={s.m ? "none" : (COLOR[s.q] || "#999")} strokeWidth={s.m ? 0 : 0.6} strokeOpacity={op}
+              style={interactive
+                ? { cursor: "pointer", animation: "dotin .3s ease both", animationDelay: `${(key % 30) * 20}ms` }
+                : undefined}
               onMouseEnter={interactive ? () => setHover({ cx, cy, s }) : undefined} />
           );
         })}
@@ -103,10 +90,9 @@ export default function Court({ shots = [], mode = "scatter", interactive = fals
           stroke={COLOR[hover.s.q] || "#fff"} strokeWidth="1.4" />}
       </svg>
       {interactive && hover && (
-        <div className="shottip" style={{
-          left: `${(hover.cx / 300) * 100}%`, top: `${(hover.cy / 250) * 100}%` }}>
+        <div className="shottip" style={{ left: `${(hover.cx / 300) * 100}%`, top: `${(hover.cy / 250) * 100}%` }}>
           <b>{hover.s.v === 3 ? "3PT" : "2PT"} · {LABEL[hover.s.q]}</b>
-          <span>{hover.s.xp != null ? `worth ${hover.s.xp} pts` : ""} · {hover.s.m ? "made ✓" : "missed ✗"}</span>
+          <span>{hover.s.xp != null ? `worth ${hover.s.xp} pts · ` : ""}{hover.s.m ? "made ✓" : "missed ✗"}</span>
         </div>
       )}
     </div>
