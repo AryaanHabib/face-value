@@ -118,6 +118,7 @@ function Identity({ p, list, pick, setPick, win }) {
         <div className="cmp-team">{p.team}</div>
       </div>
       <div className={"cmp-grade " + (pos ? "up" : "down")}>{pos ? "+" : ""}{p.per100}</div>
+      <div className="cmp-unit">xPTS+</div>
       <span className={"tag " + p.cat} style={{ margin: "0 auto", display: "table" }}>{p.verdict}</span>
     </div>
   );

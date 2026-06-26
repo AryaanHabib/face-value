@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Court from "./components/Court";
 import Head from "./components/Head";
+import CountUp from "./components/CountUp";
 
 export default function Home() {
   const [data, setData] = useState(null);
   const [q, setQ] = useState("");
   const [team, setTeam] = useState("ALL");
   const [view, setView] = useState("all"); // all | good | bad
+  const [info, setInfo] = useState(false);
 
   useEffect(() => { fetch("/players.json").then(r => r.json()).then(setData); }, []);
 
@@ -60,6 +62,24 @@ export default function Home() {
         </div>
         <Link className="cmp-link" href="/compare">⚔  Compare two players head-to-head →</Link>
 
+        <button className="info-toggle" onClick={() => setInfo(v => !v)}>
+          {info ? "▾" : "▸"}  What is xPTS+?
+        </button>
+        {info && (
+          <div className="info-panel">
+            <p><b>xPTS+</b> is how many points a player scores <b>above or below expectation</b>, per 100 shots — given how hard their shots were.</p>
+            <ul>
+              <li>A model trained on ~219k shots rates every shot's difficulty (an open three counts more than a contested layup).</li>
+              <li>It compares actual points (field goals + free throws) to that expectation.</li>
+              <li>Then adjusts for how <b>contested</b> a player's shots were vs. the league.</li>
+            </ul>
+            <div className="info-scale">
+              <span><b>0</b> average</span><span className="up"><b>+10</b> great</span><span className="up"><b>+20</b> elite</span><span className="down"><b>−15</b> cold</span>
+            </div>
+            <p className="info-foot">Measures scoring efficiency vs. shot difficulty — not playmaking, defense, or rebounding.</p>
+          </div>
+        )}
+
         {hero && (<>
           <p className="eyebrow"><span>Top read</span><span>{hero.team}</span></p>
           <Link href={`/player/${hero.id}`}>
@@ -71,8 +91,8 @@ export default function Home() {
                 <div style={{ width: 104, flex: "none" }}><Court shots={(data.shots[hero.id] || []).slice(0, 80)} /></div>
               </div>
               <div className="quote">
-                <span className={"n " + (hero.per100 >= 0 ? "up" : "down")}>{hero.per100 >= 0 ? "+" : ""}{hero.per100}</span>
-                <span className="u">pts / 100 shots vs expected</span>
+                <CountUp value={hero.per100} className={"n " + (hero.per100 >= 0 ? "up" : "down")} />
+                <span className="u"><b>xPTS+</b>points per 100<br/>vs expected</span>
               </div>
               <span className={"tag " + hero.cat}>{hero.verdict}</span>
               <div className="splitrow">

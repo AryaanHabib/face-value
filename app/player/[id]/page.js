@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Court from "../../components/Court";
 import Head from "../../components/Head";
+import CountUp from "../../components/CountUp";
 
 const QUAL = [["good", "Good"], ["mid", "OK"], ["bad", "Bad"]];
 
@@ -25,6 +26,9 @@ export default function Player() {
   const p = data.players.find(x => String(x.id) === String(id));
   if (!p) return <div className="wrap"><Link className="back" href="/">← back</Link><p>Player not found.</p></div>;
   const pos = p.per100 >= 0;
+  const rank = data.players.findIndex(x => x.id === p.id) + 1;
+  const total = data.players.length;
+  const pct = Math.round((1 - (rank - 1) / total) * 100);
   const toggleQ = (k) => { const n = new Set(qual); n.has(k) ? n.delete(k) : n.add(k); setQual(n); };
 
   return (
@@ -34,11 +38,14 @@ export default function Player() {
           <div><div className="mark" style={{ fontSize: 17 }}>{p.name}</div>
           <div className="tagline">{p.team} · {p.shots} FGA</div></div></div>
         <div className="meta" style={{ fontFamily: "var(--disp)", fontWeight: 700, fontSize: 16,
-          color: pos ? "var(--up)" : "var(--down)" }}>{pos ? "▲ +" : "▼ "}{p.per100}</div>
+          color: pos ? "var(--up)" : "var(--down)" }}>{pos ? "▲ " : "▼ "}<CountUp value={p.per100} /></div>
       </div>
       <div className="wrap">
         <Link className="back" href="/">← back to the market</Link>
-        <div><span className={"tag " + p.cat} style={{ marginBottom: 14 }}>{p.verdict}</span></div>
+        <div className="ph-meta">
+          <span className={"tag " + p.cat}>{p.verdict}</span>
+          <span className="ph-rank"><b>xPTS+ #{rank}</b> of {total} · top {pct}%</span>
+        </div>
 
         {p.openness_adj != null && (
           <div className="v2box">
